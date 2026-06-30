@@ -1,0 +1,126 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'EkusheyPuja';
+  src: url('/fonts/EkusheyPuja.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --color-primary: #162C27; /* Midnight Cypress Green */
+  --color-primary-light: #20413A;
+  --color-primary-dark: #0D1C19;
+  --color-secondary: #FAF9F5; /* Warm Alabaster White */
+  --color-secondary-dark: #EFECE6; /* Earthy Silk Warm Grey */
+  --color-accent: #890B0B; /* Brand Maroon */
+  --color-accent-dark: #660606;
+  --color-accent-light: #AD1717;
+  --color-dark: #1B1B1B; /* Charcoal Midnight Text */
+  --color-white: #FFFFFF;
+
+  --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-playfair), "Playfair Display", Georgia, serif;
+  --font-logo: "EkusheyPuja", Georgia, serif;
+}
+
+:root {
+  --background: #FAF9F5; /* Alabaster as default root background */
+  --foreground: #1B1B1B; /* Dark charcoal text */
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAF9F5;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #162C27;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #C58F3C;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+body {
+  font-family: var(--font-inter), sans-serif;
+}
+
+/* Glassmorphism Styles */
+.glass {
+  background: rgba(250, 249, 245, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(250, 249, 245, 0.25);
+}
+
+.glass-dark {
+  background: rgba(22, 44, 39, 0.65);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(250, 249, 245, 0.08);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 4px 24px 0 rgba(22, 44, 39, 0.03);
+}
+
+/* Tighter Compact Spacing Classes */
+.compact-section {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
+@media (min-width: 768px) {
+  .compact-section {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
+/* Swiper custom styling overrides for elegant look */
+.swiper-pagination-bullet {
+  background: #162C27 !important;
+  opacity: 0.3;
+}
+
+.swiper-pagination-bullet-active {
+  background: #C58F3C !important;
+  opacity: 1 !important;
+  width: 20px !important;
+  border-radius: 3px !important;
+  transition: all 0.3s ease !important;
+}
+
+.swiper-button-next, .swiper-button-prev {
+  color: #C58F3C !important;
+}
+
+/* Form Autofill overrides */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1B1B1B;
+  -webkit-box-shadow: 0 0 0px 1000px #FAF9F5 inset;
+  transition: background-color 5000s ease-in-out 0s;
+}

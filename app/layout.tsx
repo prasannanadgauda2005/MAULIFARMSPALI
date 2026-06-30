@@ -128,7 +128,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className={`${inter.variable} ${playfair.variable} font-sans bg-secondary text-dark antialiased selection:bg-accent selection:text-primary-dark min-h-screen flex flex-col`}
+        className={`${inter.variable} ${playfair.variable} font-sans bg-secondary text-dark antialiased selection:bg-accent selection:text-primary-dark min-h-screen flex flex-col overflow-x-hidden w-full max-w-full`}
       >
         {children}
       </body>

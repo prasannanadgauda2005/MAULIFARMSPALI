@@ -49,39 +49,50 @@ async function ensureDirectoryExists(dir: string) {
 
 export async function GET() {
   try {
+    const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+
     // 1. Cloud-storage (Vercel Blob) mode
-    if (process.env.BLOB_READ_WRITE_TOKEN) {
+    if (hasBlobToken) {
       const { blobs } = await list({ prefix: 'custom-images.json' });
       const blob = blobs.find(b => b.pathname === 'custom-images.json');
       if (blob) {
         const res = await fetch(blob.url);
         const config = await res.json();
-        return NextResponse.json(config);
+        return NextResponse.json({ ...config, hasBlobToken: true });
       }
-      return NextResponse.json(defaultFallbackConfig);
+      return NextResponse.json({ ...defaultFallbackConfig, hasBlobToken: true });
     }
 
     // 2. Local-storage fallback mode
     const data = await fs.readFile(configPath, 'utf-8');
-    return NextResponse.json(JSON.parse(data));
+    const config = JSON.parse(data);
+    return NextResponse.json({ ...config, hasBlobToken: false });
   } catch (error) {
-    return NextResponse.json(defaultFallbackConfig);
+    const hasBlobToken = !!process.env.BLOB_READ_WRITE_TOKEN;
+    return NextResponse.json({ ...defaultFallbackConfig, hasBlobToken });
   }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const formData = await req.formData();
-    const file = formData.get('file') as File | null;
-    const url = formData.get('url') as string | null;
-    const key = formData.get('key') as string | null;
+    const contentType = req.headers.get('content-type') || '';
+    let file: File | null = null;
+    let url: string | null = null;
+    let key: string | null = null;
+
+    if (contentType.includes('application/json')) {
+      const json = await req.json();
+      key = json.key;
+      url = json.url;
+    } else {
+      const formData = await req.formData();
+      file = formData.get('file') as File | null;
+      url = formData.get('url') as string | null;
+      key = formData.get('key') as string | null;
+    }
 
     if (!key) {
       return NextResponse.json({ error: 'Missing configuration key' }, { status: 400 });
-    }
-
-    if (!file && !url) {
-      return NextResponse.json({ error: 'Missing file or URL content' }, { status: 400 });
     }
 
     let relativeUrl = url || '';
@@ -89,7 +100,7 @@ export async function POST(req: NextRequest) {
 
     // 1. Cloud Mode using Vercel Blob
     if (process.env.BLOB_READ_WRITE_TOKEN) {
-      // If file is uploaded, push to Vercel Blob
+      // If server-side backup upload is used
       if (file) {
         const filename = `${key.replace('-', '_')}_${Date.now()}${path.extname(file.name)}`;
         const blobFile = await put(filename, file, { access: 'public' });

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, Lock, Home, Image as ImageIcon, Eye, RefreshCw, AlertCircle, CheckCircle2, Film, Link as LinkIcon } from 'lucide-react';
+import { upload } from '@vercel/blob/client';
 import { Button } from '../../components/ui/Button';
 
 interface GalleryAlbums {
@@ -22,6 +23,7 @@ interface CustomImages {
   waterfallVideo: string;
   tourVideo: string;
   gallery: GalleryAlbums;
+  hasBlobToken?: boolean;
 }
 
 const ALBUM_SCHEMAS = [
@@ -75,7 +77,6 @@ export default function AdminPage() {
   const [uploadingKey, setUploadingKey] = useState<string | null>(null);
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
-  // Custom states for pasting links manually
   const [inputUrls, setInputUrls] = useState<Record<string, string>>({});
 
   const ADMIN_PASSCODE = 'mauli123';
@@ -137,32 +138,62 @@ export default function AdminPage() {
     setUploadingKey(key);
     setStatusMsg(null);
 
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('key', key);
-
     try {
-      const res = await fetch('/api/admin/images', {
-        method: 'POST',
-        body: formData,
-      });
+      // 1. Direct Cloud Mode (Client-Side Upload directly to Vercel Blob)
+      // Bypasses 4.5MB payload limit entirely!
+      if (config?.hasBlobToken) {
+        setStatusMsg({ type: 'success', text: `Uploading file directly to cloud storage (bypassing size limits)...` });
+        
+        const newBlob = await upload(file.name, file, {
+          access: 'public',
+          handleUploadUrl: '/api/admin/images/upload-token',
+        });
 
-      if (!res.ok) {
-        if (res.status === 413) {
-          throw new Error('File exceeds Vercel Serverless size limit (4.5MB). Please compress the file to under 4MB, or upload it to your Vercel Blob dashboard and paste the link below!');
+        // Save URL config change on server
+        const saveRes = await fetch('/api/admin/images', {
+          method: 'POST',
+          body: JSON.stringify({ key, url: newBlob.url }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+
+        if (!saveRes.ok) {
+          throw new Error('Failed to register uploaded URL to configuration');
         }
-        const errorText = await res.text();
-        throw new Error(errorText || 'Server upload failed');
-      }
 
-      const data = await res.json();
-      if (data.success) {
-        setConfig(data.config);
-        setStatusMsg({ type: 'success', text: `${isVideo ? 'Video' : 'Image'} updated successfully!` });
+        const saveData = await saveRes.json();
+        setConfig(saveData.config);
+        setStatusMsg({ type: 'success', text: `${isVideo ? 'Video' : 'Image'} uploaded directly to Vercel Blob successfully!` });
       } else {
-        throw new Error(data.error || 'Upload failed');
+        // 2. Local Fallback Mode (Filesystem server uploads)
+        // Check size limit for local storage
+        if (file.size > 50 * 1024 * 1024) {
+          throw new Error('File exceeds local size limit (50MB). Please compress files before uploading.');
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('key', key);
+
+        const res = await fetch('/api/admin/images', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const errorText = await res.text();
+          throw new Error(errorText || 'Server upload failed');
+        }
+
+        const data = await res.json();
+        if (data.success) {
+          setConfig(data.config);
+          setStatusMsg({ type: 'success', text: `${isVideo ? 'Video' : 'Image'} updated locally successfully!` });
+        } else {
+          throw new Error(data.error || 'Upload failed');
+        }
       }
     } catch (err: any) {
+      console.error(err);
       setStatusMsg({ type: 'error', text: err.message || 'Failed to upload file' });
     } finally {
       setUploadingKey(null);
@@ -315,7 +346,10 @@ export default function AdminPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="font-serif text-3xl font-bold text-primary">Website Asset Manager</h1>
-            <p className="text-sm font-light text-dark/60 mt-1">Upload files OR paste cloud links directly to update images and videos</p>
+            <p className="text-sm font-light text-dark/60 mt-1">
+              Upload files OR paste cloud links directly to update images and videos.
+              {config?.hasBlobToken && <span className="text-emerald-700 font-bold ml-1">✓ Cloud direct-upload active (No file size limits!)</span>}
+            </p>
           </div>
           <button 
             onClick={fetchConfig}
@@ -471,7 +505,11 @@ export default function AdminPage() {
               </h2>
               <p className="text-xs text-dark/50 font-light mb-6 -mt-3">
                 Upload MP4 clips or paste direct links for your private waterfall showcase and virtual tour bubble. 
-                <span className="text-accent font-semibold ml-1">Tip: For video files larger than 4.5MB, upload to the Vercel Blob dashboard and paste the link below!</span>
+                {config?.hasBlobToken ? (
+                  <span className="text-emerald-700 font-bold ml-1">✓ Cloud direct-upload is active! You can upload videos of any size with zero restrictions.</span>
+                ) : (
+                  <span className="text-accent font-semibold ml-1">Note: Enable Vercel Blob inside your Vercel Dashboard Storage tab to upload large files directly.</span>
+                )}
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

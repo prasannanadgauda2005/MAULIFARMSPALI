@@ -3,12 +3,14 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { Clock, Star, ArrowRight } from 'lucide-react';
+import { Clock, ArrowRight } from 'lucide-react';
 import { SectionTitle } from './SectionTitle';
-import { experiences } from '../data/content';
 import { Button } from './ui/Button';
+import { useCustomImages } from '../hooks/useCustomImages';
 
 export const Experiences = () => {
+  const { images } = useCustomImages();
+
   const handleInquireExperience = (experienceTitle: string) => {
     // Scroll to the booking form
     const formElement = document.getElementById('booking-form');
@@ -74,7 +76,7 @@ export const Experiences = () => {
           viewport={{ once: true, margin: '-100px' }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {experiences.map((exp) => (
+          {images.experiences.map((exp) => (
             <motion.div
               key={exp.id}
               variants={cardVariants}
@@ -89,13 +91,8 @@ export const Experiences = () => {
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   loading="lazy"
+                  unoptimized
                 />
-                {exp.duration && (
-                  <div className="absolute top-4 left-4 py-1.5 px-3 rounded-full text-[10px] font-bold uppercase tracking-wider bg-white/80 backdrop-blur-md text-primary border border-white/20 flex items-center gap-1">
-                    <Clock className="h-3 w-3 text-accent" />
-                    {exp.duration}
-                  </div>
-                )}
               </div>
 
               {/* Text content */}

@@ -7,7 +7,7 @@ export const siteConfig = {
   taglineSub: 'Exclusive Private Villa Farmhouse with Waterfall & Stream in Pali',
   phone: '+91 99675 19079',
   whatsapp: '919967519079',
-  email: 'bookings@maulifarms.com',
+  email: 'maulifarms@gmail.com',
   address: 'Mauli Farms, State Highway 97, Pali, Sudhagad, Maharashtra 410205',
   workingHours: '9:00 AM - 9:00 PM (Monday - Sunday)',
   socials: {

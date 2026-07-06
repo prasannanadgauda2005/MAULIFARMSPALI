@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Lock, Home, Image as ImageIcon, Eye, RefreshCw, AlertCircle, CheckCircle2, Film, Link as LinkIcon } from 'lucide-react';
+import { Upload, Lock, Home, Image as ImageIcon, Eye, RefreshCw, AlertCircle, CheckCircle2, Film, Link as LinkIcon, Edit3, Save, Sparkles } from 'lucide-react';
 import { upload } from '@vercel/blob/client';
 import { Button } from '../../components/ui/Button';
 
@@ -16,6 +16,14 @@ interface GalleryAlbums {
   videos: string[];
 }
 
+interface ExperienceItem {
+  id: string;
+  title: string;
+  description: string;
+  image: string;
+  highlight: string;
+}
+
 interface CustomImages {
   heroBg: string;
   aboutBg: string;
@@ -23,6 +31,7 @@ interface CustomImages {
   waterfallVideo: string;
   tourVideo: string;
   gallery: GalleryAlbums;
+  experiences: ExperienceItem[];
   hasBlobToken?: boolean;
 }
 
@@ -78,6 +87,9 @@ export default function AdminPage() {
   const [statusMsg, setStatusMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   
   const [inputUrls, setInputUrls] = useState<Record<string, string>>({});
+  
+  // Custom states for editing experiences
+  const [expTextStates, setExpTextStates] = useState<Record<string, { title: string; highlight: string; description: string }>>({});
 
   const ADMIN_PASSCODE = 'mauli123';
 
@@ -88,6 +100,20 @@ export default function AdminPage() {
       fetchConfig();
     }
   }, []);
+
+  useEffect(() => {
+    if (config?.experiences) {
+      const initialStates: Record<string, { title: string; highlight: string; description: string }> = {};
+      config.experiences.forEach((exp) => {
+        initialStates[exp.id] = {
+          title: exp.title || '',
+          highlight: exp.highlight || '',
+          description: exp.description || ''
+        };
+      });
+      setExpTextStates(initialStates);
+    }
+  }, [config]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -232,6 +258,55 @@ export default function AdminPage() {
       }
     } catch (err: any) {
       setStatusMsg({ type: 'error', text: err.message || 'Failed to save link' });
+    } finally {
+      setUploadingKey(null);
+    }
+  };
+
+  const handleExpTextChange = (id: string, field: 'title' | 'highlight' | 'description', value: string) => {
+    setExpTextStates(prev => ({
+      ...prev,
+      [id]: {
+        ...prev[id],
+        [field]: value
+      }
+    }));
+  };
+
+  const handleSaveExpText = async (id: string) => {
+    const fields = expTextStates[id];
+    if (!fields) return;
+
+    const fieldKey = `experience-${id}-text`;
+    setUploadingKey(fieldKey);
+    setStatusMsg(null);
+
+    try {
+      const res = await fetch('/api/admin/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: fieldKey,
+          title: fields.title,
+          highlight: fields.highlight,
+          description: fields.description
+        }),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || 'Failed to update experience details');
+      }
+
+      const data = await res.json();
+      if (data.success) {
+        setConfig(data.config);
+        setStatusMsg({ type: 'success', text: `Experience "${fields.title}" details updated successfully!` });
+      } else {
+        throw new Error(data.error || 'Update failed');
+      }
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: err.message || 'Failed to save experience details' });
     } finally {
       setUploadingKey(null);
     }
@@ -662,7 +737,7 @@ export default function AdminPage() {
             </div>
 
             {/* 3. Categorized Gallery Albums Section */}
-            <div>
+            <div className="border-b border-secondary-dark/60 pb-8">
               <h2 className="text-lg font-serif font-bold text-primary mb-4 flex items-center gap-2">
                 <ImageIcon className="h-5 w-5 text-accent" />
                 Live Gallery Albums (Up to 3 Photos Each)
@@ -746,6 +821,120 @@ export default function AdminPage() {
                           );
                         })}
                       </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 4. Curated Private Experiences Editor Section */}
+            <div>
+              <h2 className="text-lg font-serif font-bold text-primary mb-4 flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-accent" />
+                Curated Private Experiences Editor
+              </h2>
+              <p className="text-xs text-dark/50 font-light mb-6 -mt-3">
+                Update the photos, titles, descriptions, and highlights for your 6 signature estate experiences.
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {config.experiences?.map((exp) => {
+                  const state = expTextStates[exp.id] || { title: '', highlight: '', description: '' };
+                  const imgKey = `experience-${exp.id}-image`;
+
+                  return (
+                    <div key={exp.id} className="bg-white rounded-3xl p-6 border border-secondary-dark/60 shadow-sm flex flex-col justify-between space-y-6">
+                      <div className="space-y-4">
+                        {/* Title & Highlight */}
+                        <div className="flex items-center justify-between border-b border-secondary-dark pb-2">
+                          <span className="text-[10px] font-bold text-accent uppercase tracking-wider">Experience Block ({exp.id.toUpperCase()})</span>
+                        </div>
+
+                        {/* Image Preview & Upload */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-start">
+                          <div className="relative aspect-video w-full sm:w-40 shrink-0 rounded-xl overflow-hidden border border-secondary-dark bg-secondary">
+                            <Image
+                              src={exp.image || '/images/gallery/villa-exterior-day.jpg'}
+                              alt={exp.title}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="w-full space-y-2.5">
+                            <label className="relative w-full block">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => handleFileUpload(e, imgKey)}
+                                disabled={uploadingKey !== null}
+                              />
+                              <span className="w-full py-2 rounded-lg border border-secondary-dark bg-secondary hover:bg-secondary-dark text-[10px] font-bold text-primary tracking-wide uppercase flex items-center justify-center gap-1 cursor-pointer transition-colors shadow-sm">
+                                <Upload className="h-3.5 w-3.5" />
+                                {uploadingKey === imgKey ? 'Uploading...' : 'Replace Photo'}
+                              </span>
+                            </label>
+                            <div className="flex gap-1.5 items-center">
+                              <input
+                                type="text"
+                                placeholder="Or paste direct image URL"
+                                value={inputUrls[imgKey] || ''}
+                                onChange={(e) => setInputUrls({ ...inputUrls, [imgKey]: e.target.value })}
+                                className="flex-grow text-[10px] px-2.5 py-1.5 border border-secondary-dark/60 rounded-lg focus:outline-none"
+                              />
+                              <button
+                                onClick={() => handleLinkUpdate(imgKey)}
+                                disabled={uploadingKey !== null}
+                                className="p-1.5 bg-primary text-white hover:bg-primary-light rounded-lg transition-colors"
+                              >
+                                <LinkIcon className="h-3 w-3" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Text input fields */}
+                        <div className="space-y-3">
+                          <div>
+                            <label className="text-[10px] font-bold text-primary/60 uppercase block mb-1">Experience Title</label>
+                            <input
+                              type="text"
+                              value={state.title}
+                              onChange={(e) => handleExpTextChange(exp.id, 'title', e.target.value)}
+                              className="w-full text-xs px-3 py-2 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-primary/60 uppercase block mb-1">Highlight Badge text</label>
+                            <input
+                              type="text"
+                              value={state.highlight}
+                              onChange={(e) => handleExpTextChange(exp.id, 'highlight', e.target.value)}
+                              className="w-full text-xs px-3 py-2 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] font-bold text-primary/60 uppercase block mb-1">Description Narrative</label>
+                            <textarea
+                              rows={3}
+                              value={state.description}
+                              onChange={(e) => handleExpTextChange(exp.id, 'description', e.target.value)}
+                              className="w-full text-xs px-3 py-2 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent resize-none leading-relaxed"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Save Text button */}
+                      <button
+                        onClick={() => handleSaveExpText(exp.id)}
+                        disabled={uploadingKey !== null}
+                        className="w-full py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-sm"
+                      >
+                        <Save className="h-3.5 w-3.5" />
+                        Save Text Details
+                      </button>
                     </div>
                   );
                 })}

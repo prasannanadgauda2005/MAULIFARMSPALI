@@ -1,5 +1,5 @@
 {
-  "heroBg": "/images/gallery/villa-exterior-1.jpg",
+  "heroBg": "/images/uploads/heroBg_1783353625515.JPG",
   "aboutBg": "/images/gallery/villa-exterior-2.jpg",
   "waterfallBg": "/images/gallery/villa-exterior-3.jpg",
   "waterfallVideo": "https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-forest-2213-large.mp4",
@@ -8,21 +8,27 @@
     "exterior": [
       "/images/uploads/gallery_exterior-0_1783345941442.JPG",
       "/images/gallery/villa-exterior-2.jpg",
-      "/images/gallery/villa-exterior-3.jpg"
+      "/images/uploads/gallery_exterior-2_1783353668918.jpg"
     ],
     "living": [
       "/images/gallery/living-room-1.jpg",
-      "/images/gallery/living-room-2.jpg"
+      "/images/uploads/gallery_living-1_1783353679668.JPG",
+      "/images/uploads/gallery_living-2_1783353689429.JPG"
     ],
     "pool": [
-      "/images/gallery/pool-view-1.jpg",
-      "/images/gallery/pool-view-2.jpg"
+      "/images/uploads/gallery_pool-0_1783353705697.JPG",
+      "/images/uploads/gallery_pool-1_1783353712455.jpg",
+      "/images/uploads/gallery_pool-2_1783353721982.JPG"
     ],
     "bedroom": [
-      "/images/gallery/bedroom-view-1.png"
+      "/images/gallery/bedroom-view-1.png",
+      "/images/uploads/gallery_bedroom-1_1783353740344.JPG",
+      "/images/uploads/gallery_bedroom-2_1783353762453.JPG"
     ],
     "bathroom": [
-      "/images/gallery/villa-exterior-day.jpg"
+      "/images/uploads/gallery_bathroom-0_1783353786130.JPG",
+      "/images/uploads/gallery_bathroom-1_1783353795023.JPG",
+      "/images/uploads/gallery_bathroom-2_1783353800009.JPG"
     ],
     "videos": [
       "https://assets.mixkit.co/videos/preview/mixkit-waterfall-in-forest-2213-large.mp4",

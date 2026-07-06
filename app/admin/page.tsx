@@ -166,8 +166,8 @@ export default function AdminPage() {
       } else {
         // 2. Local Fallback Mode (Filesystem server uploads)
         // Check size limit for local storage
-        if (file.size > 50 * 1024 * 1024) {
-          throw new Error('File exceeds local size limit (50MB). Please compress files before uploading.');
+        if (file.size > 200 * 1024 * 1024) {
+          throw new Error('File exceeds local size limit (200MB). Please compress files before uploading.');
         }
 
         const formData = new FormData();

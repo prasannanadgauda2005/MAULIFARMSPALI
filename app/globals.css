@@ -9,15 +9,18 @@
 }
 
 @theme {
-  --color-primary: #162C27; /* Midnight Cypress Green */
-  --color-primary-light: #20413A;
-  --color-primary-dark: #0D1C19;
-  --color-secondary: #FAF9F5; /* Warm Alabaster White */
-  --color-secondary-dark: #EFECE6; /* Earthy Silk Warm Grey */
-  --color-accent: #890B0B; /* Brand Maroon */
+  --color-primary: #142721; /* Deep Cypress Pine */
+  --color-primary-light: #1D3A31;
+  --color-primary-dark: #0B1713;
+  --color-secondary: #FAF8F5; /* Warm Alabaster Linen */
+  --color-secondary-dark: #EFEAE2; /* Earthy Warm Sand */
+  --color-accent: #890B0B; /* Brand Heritage Maroon */
   --color-accent-dark: #660606;
-  --color-accent-light: #AD1717;
-  --color-dark: #1B1B1B; /* Charcoal Midnight Text */
+  --color-accent-light: #A51717;
+  --color-gold: #C59B27; /* Rich Antique Gold */
+  --color-gold-light: #DFC060;
+  --color-gold-dark: #9E7A16;
+  --color-dark: #141816; /* Midnight Charcoal Forest */
   --color-white: #FFFFFF;
 
   --font-sans: var(--font-inter), "Inter", system-ui, -apple-system, sans-serif;

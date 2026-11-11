@@ -1,174 +1,192 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import { Menu, X, Phone, MessageSquare } from 'lucide-react';
 import { useScroll } from '../hooks/useScroll';
 import { siteConfig } from '../data/content';
 import { cn } from '../lib/utils';
-import { Button } from './ui/Button';
 
-const menuItems = [
-  { label: 'Home', href: '#home' },
+const navItems = [
   { label: 'About', href: '#about' },
+  { label: 'Rooms & Layout', href: '#villa' },
+  { label: 'Highlights', href: '#highlights' },
   { label: 'Gallery', href: '#gallery' },
-  { label: 'Experiences', href: '#experiences' },
-  { label: 'Amenities', href: '#amenities' },
-  { label: 'The Villa', href: '#accommodation' },
   { label: 'Location', href: '#location' },
-  { label: 'Contact', href: '#contact' }
+  { label: 'Contact', href: '#book' },
 ];
 
+import { TopNoticeBar } from './TopNoticeBar';
+
 export const Navbar = () => {
-  const { scrolled } = useScroll(50);
-  const [isOpen, setIsOpen] = useState(false);
+  const { scrolled } = useScroll(30);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-
-  // Helper to handle smooth scroll on link click
-  const handleScrollTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    e.preventDefault();
-    setIsOpen(false);
-    const target = document.querySelector(href);
-    if (target) {
-      target.scrollIntoView({ behavior: 'smooth' });
+  const scrollTo = (href: string) => {
+    setMobileMenuOpen(false);
+    const element = document.querySelector(href);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
     }
   };
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.5 }}
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 py-4 px-6 md:px-12',
-          scrolled 
-            ? 'bg-white shadow-md border-b border-secondary-dark/50 py-3' 
-            : 'bg-gradient-to-b from-black/60 to-transparent py-5'
-        )}
-      >
+      <header className="fixed top-0 left-0 right-0 z-50">
+        <TopNoticeBar />
+        <div
+          className={cn(
+            'transition-all duration-300 px-6 lg:px-12',
+            scrolled
+              ? 'bg-secondary/95 backdrop-blur-md py-3 border-b border-secondary-dark shadow-sm'
+              : 'bg-gradient-to-b from-black/80 via-black/40 to-transparent py-3.5 text-white'
+          )}
+        >
         <div className="max-w-7xl mx-auto flex items-center justify-between">
-          {/* Logo */}
-          <a 
-            href="#home" 
-            onClick={(e) => handleScrollTo(e, '#home')}
-            className="flex items-center gap-2.5 group"
+          {/* Logo & Brand Wordmark */}
+          <a
+            href="#home"
+            onClick={(e) => {
+              e.preventDefault();
+              scrollTo('#home');
+            }}
+            className="flex items-center gap-3 group"
           >
-            <div className="relative h-9 w-9 overflow-hidden rounded-full border border-white/20 shadow-sm transition-transform duration-300 group-hover:scale-105">
+            <div className="relative h-10 w-10 rounded-full overflow-hidden border border-white/30 bg-primary/20 shrink-0">
               <Image
                 src="/images/logo.png"
-                alt="Mauli Farms Pali Logo"
+                alt="Mauli Farms Pali"
                 fill
                 className="object-cover"
-                sizes="36px"
+                sizes="40px"
+                priority
               />
             </div>
-            <span className={cn(
-              'font-logo text-xl md:text-2xl font-bold tracking-wider transition-colors duration-300',
-              scrolled ? 'text-primary' : 'text-white'
-            )}>
-              {siteConfig.name}
-            </span>
+            <div className="flex flex-col">
+              <span
+                className={cn(
+                  'font-logo text-xl sm:text-2xl font-bold tracking-wide transition-colors',
+                  scrolled ? 'text-primary' : 'text-white'
+                )}
+              >
+                {siteConfig.name}
+              </span>
+              <span
+                className={cn(
+                  'text-[10px] tracking-[0.2em] uppercase font-medium -mt-1',
+                  scrolled ? 'text-dark/60' : 'text-white/70'
+                )}
+              >
+                Pali, Maharashtra
+              </span>
+            </div>
           </a>
 
-          {/* Desktop Menu */}
-          <div className="hidden lg:flex items-center space-x-7">
-            {menuItems.map((item) => (
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8 text-sm font-medium">
+            {navItems.map((item) => (
               <a
                 key={item.label}
                 href={item.href}
-                onClick={(e) => handleScrollTo(e, item.href)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo(item.href);
+                }}
                 className={cn(
-                  'text-sm font-medium tracking-wide transition-all duration-300 hover:text-accent relative py-1 after:absolute after:bottom-0 after:left-0 after:right-0 after:h-[2px] after:bg-accent after:scale-x-0 hover:after:scale-x-100 after:transition-transform after:duration-300',
-                  scrolled ? 'text-primary' : 'text-white/90'
+                  'transition-colors hover:text-amber-600',
+                  scrolled ? 'text-dark/80' : 'text-white/90'
                 )}
               >
                 {item.label}
               </a>
             ))}
-            
-            <Button
-              variant={scrolled ? 'primary' : 'accent'}
-              size="sm"
-              onClick={() => {
-                const target = document.querySelector('#booking-form');
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
-              }}
-            >
-              Book Now
-            </Button>
-          </div>
+          </nav>
 
-          {/* Hamburger Trigger */}
-          <div className="lg:hidden">
-            <button
-              onClick={toggleMenu}
-              aria-label="Toggle navigation menu"
+          {/* Right Action Buttons */}
+          <div className="hidden sm:flex items-center gap-3">
+            <a
+              href={`tel:${siteConfig.phone}`}
               className={cn(
-                'p-2 rounded-full transition-colors focus:outline-none',
-                scrolled ? 'text-primary hover:bg-secondary' : 'text-white hover:bg-white/10'
+                'flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-full transition-colors',
+                scrolled
+                  ? 'text-primary hover:bg-secondary-dark'
+                  : 'text-white hover:bg-white/10'
               )}
             >
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              <Phone className="h-3.5 w-3.5" />
+              <span>{siteConfig.phone}</span>
+            </a>
+
+            <button
+              onClick={() => scrollTo('#book')}
+              className="bg-accent hover:bg-accent-light text-white text-xs font-semibold px-5 py-2.5 rounded-full transition-all shadow-sm hover:shadow"
+            >
+              Reserve Stay
+            </button>
+          </div>
+
+          {/* Mobile Hamburger */}
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={() => scrollTo('#book')}
+              className="bg-accent text-white text-xs font-semibold px-3.5 py-1.5 rounded-full"
+            >
+              Book
+            </button>
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+              className={cn(
+                'p-2 rounded-full',
+                scrolled ? 'text-primary hover:bg-secondary-dark' : 'text-white hover:bg-white/10'
+              )}
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
-      </motion.nav>
+        </div>
+      </header>
 
       {/* Mobile Drawer */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="fixed inset-0 top-[60px] z-40 bg-white flex flex-col p-6 border-t border-secondary-dark lg:hidden"
-          >
-            <div className="flex flex-col space-y-5 my-auto">
-              {menuItems.map((item, idx) => (
-                <motion.a
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  key={item.label}
-                  href={item.href}
-                  onClick={(e) => handleScrollTo(e, item.href)}
-                  className="font-serif text-2xl text-primary hover:text-accent tracking-wide transition-colors"
-                >
-                  {item.label}
-                </motion.a>
-              ))}
-            </div>
-            
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="mt-auto space-y-4"
-            >
-              <div className="border-t border-secondary-dark pt-6 text-sm text-primary/60 font-medium">
-                Pali, Maharashtra • {siteConfig.phone}
-              </div>
-              
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full flex items-center justify-center gap-2"
-                onClick={() => {
-                  setIsOpen(false);
-                  const target = document.querySelector('#booking-form');
-                  if (target) target.scrollIntoView({ behavior: 'smooth' });
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 top-[65px] z-40 bg-secondary flex flex-col p-6 border-t border-secondary-dark md:hidden">
+          <div className="flex flex-col space-y-4 my-auto">
+            {navItems.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollTo(item.href);
                 }}
+                className="font-serif text-2xl text-primary hover:text-accent py-1 transition-colors"
               >
-                Inquire & Book Now <ArrowRight className="h-4 w-4" />
-              </Button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                {item.label}
+              </a>
+            ))}
+          </div>
+
+          <div className="mt-auto pt-6 border-t border-secondary-dark space-y-3">
+            <a
+              href={`https://wa.me/${siteConfig.whatsapp}?text=Hello%20Mauli%20Farms%20Pali%2C%20I%20would%20like%20to%20inquire%20about%20booking.`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 w-full py-3 bg-emerald-700 text-white rounded-xl text-sm font-semibold"
+            >
+              <MessageSquare className="h-4 w-4" />
+              Chat on WhatsApp
+            </a>
+            <a
+              href={`tel:${siteConfig.phone}`}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-secondary-dark text-primary rounded-xl text-sm font-semibold"
+            >
+              <Phone className="h-4 w-4" />
+              Call: {siteConfig.phone}
+            </a>
+          </div>
+        </div>
+      )}
     </>
   );
 };

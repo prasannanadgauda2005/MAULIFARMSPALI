@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, Lock, Home, Image as ImageIcon, Eye, RefreshCw, AlertCircle, CheckCircle2, Film, Link as LinkIcon, Edit3, Save, Sparkles } from 'lucide-react';
+import { Upload, Lock, Home, Image as ImageIcon, Eye, RefreshCw, AlertCircle, CheckCircle2, Film, Link as LinkIcon, Save, Sparkles, Tag, Plus, Trash2, ToggleLeft, ToggleRight, Clock, FileText, Radio } from 'lucide-react';
 import { upload } from '@vercel/blob/client';
 import { Button } from '../../components/ui/Button';
 
@@ -24,14 +24,39 @@ interface ExperienceItem {
   highlight: string;
 }
 
+export interface DealsOffer {
+  enabled: boolean;
+  badge: string;
+  title: string;
+  description: string;
+  posterImage?: string;
+  perks: string[];
+  code: string;
+  ctaText: string;
+  ctaUrl: string;
+}
+
+export interface SiteContent {
+  announcement?: string;
+  waterfallSeasonStatus?: string;
+  templeNote?: string;
+  poolNote?: string;
+  plotArea?: string;
+  lastUpdated?: string;
+}
+
 interface CustomImages {
   heroBg: string;
   aboutBg: string;
   waterfallBg: string;
   waterfallVideo: string;
   tourVideo: string;
+  posterImage?: string;
+  posters?: string[];
+  siteContent?: SiteContent;
   gallery: GalleryAlbums;
   experiences: ExperienceItem[];
+  deals?: DealsOffer;
   hasBlobToken?: boolean;
 }
 
@@ -91,7 +116,70 @@ export default function AdminPage() {
   // Custom states for editing experiences
   const [expTextStates, setExpTextStates] = useState<Record<string, { title: string; highlight: string; description: string }>>({});
 
+  // Deals & Offers popup state
+  const [dealsState, setDealsState] = useState<DealsOffer>({
+    enabled: true,
+    badge: 'Monsoon & Weekend Special',
+    title: 'Family & Friends Gathering Offer',
+    description: 'Book for 10 or more guests and enjoy a complimentary evening stone bonfire with barbecue grill setup, plus special packages for multi-night stays!',
+    posterImage: '/images/gallery/pool-deck.jpg',
+    perks: [
+      'Complimentary Evening Bonfire & Charcoal BBQ Setup',
+      'Exclusive private access to in-plot natural waterfall & stream',
+      'Home-cooked village feasts prepared by local caretakers',
+      '100% Gated 1-Acre Lawn for kids and pets to play safely'
+    ],
+    code: 'FAMILYMAULI',
+    ctaText: 'Claim Deal on WhatsApp',
+    ctaUrl: ''
+  });
+  const [newPerkInput, setNewPerkInput] = useState('');
+
+  // Website Content & Live Notice state
+  const [siteContentState, setSiteContentState] = useState<SiteContent>({
+    announcement: "Welcome to Mauli Farms! Current Season: Private Swimming Pool, Bonfire Nights & Peaceful Sahyadri Hill Stays.",
+    waterfallSeasonStatus: "Monsoon Seasonal (Active July – Sept) · Private Pool & Freshwater Stream Year-Round",
+    templeNote: "Vitthal Rukhmini Mandir: Sacred private temple inside our 1-acre property for quiet morning darshan and prayer.",
+    poolNote: "Private 12×24 ft Swimming Pool with sun loungers, daily filtration, and scenic forest views.",
+    plotArea: "1 Acre"
+  });
+
+  const [liveClock, setLiveClock] = useState('');
+
   const ADMIN_PASSCODE = 'mauli123';
+
+  // Live real-time clock
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      setLiveClock(
+        now.toLocaleDateString('en-IN', {
+          weekday: 'short',
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        })
+      );
+    };
+    updateTime();
+    const timer = setInterval(updateTime, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const fetchConfig = async () => {
+    try {
+      const res = await fetch('/api/admin/images');
+      if (res.ok) {
+        const data = await res.json();
+        setConfig(data);
+      }
+    } catch (err) {
+      console.error('Failed to load configurations', err);
+    }
+  };
 
   useEffect(() => {
     const authStatus = localStorage.getItem('mauli_admin_authenticated');
@@ -113,7 +201,75 @@ export default function AdminPage() {
       });
       setExpTextStates(initialStates);
     }
+    if (config?.deals) {
+      setDealsState(config.deals);
+    }
+    if (config?.siteContent) {
+      setSiteContentState({
+        announcement: config.siteContent.announcement || '',
+        waterfallSeasonStatus: config.siteContent.waterfallSeasonStatus || '',
+        templeNote: config.siteContent.templeNote || '',
+        poolNote: config.siteContent.poolNote || '',
+        plotArea: config.siteContent.plotArea || '1 Acre'
+      });
+    }
   }, [config]);
+
+  const handleSaveSiteContent = async () => {
+    setUploadingKey('siteContent');
+    setStatusMsg(null);
+    try {
+      const res = await fetch('/api/admin/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'siteContent',
+          siteContent: siteContentState
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to update website content');
+      const data = await res.json();
+      if (data.success) {
+        setConfig(data.config);
+        setStatusMsg({ type: 'success', text: `Website content & notices updated live in real-time (${new Date().toLocaleTimeString()})!` });
+      } else {
+        throw new Error(data.error || 'Failed to save website content');
+      }
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: err.message || 'Failed to save content' });
+    } finally {
+      setUploadingKey(null);
+    }
+  };
+
+  const handleSaveDeals = async () => {
+    setUploadingKey('deals');
+    setStatusMsg(null);
+    try {
+      const res = await fetch('/api/admin/images', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          key: 'deals',
+          deals: dealsState
+        }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to update deals configuration');
+      }
+      const data = await res.json();
+      if (data.success) {
+        setConfig(data.config);
+        setStatusMsg({ type: 'success', text: 'Deals & Offers popup settings updated successfully!' });
+      } else {
+        throw new Error(data.error || 'Failed to save deals');
+      }
+    } catch (err: any) {
+      setStatusMsg({ type: 'error', text: err.message || 'Failed to save deals settings' });
+    } finally {
+      setUploadingKey(null);
+    }
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,18 +287,6 @@ export default function AdminPage() {
   const handleLogout = () => {
     setIsAuthenticated(false);
     localStorage.removeItem('mauli_admin_authenticated');
-  };
-
-  const fetchConfig = async () => {
-    try {
-      const res = await fetch('/api/admin/images');
-      if (res.ok) {
-        const data = await res.json();
-        setConfig(data);
-      }
-    } catch (err) {
-      console.error('Failed to load configurations', err);
-    }
   };
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, key: string, isVideo: boolean = false) => {
@@ -398,6 +542,16 @@ export default function AdminPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            {/* Real-time live date/time indicator */}
+            <div className="hidden lg:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 text-xs text-amber-200 border border-white/10">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
+              </span>
+              <Clock className="h-3.5 w-3.5 text-amber-300" />
+              <span>Live: {liveClock || 'Real-Time Synchronized'}</span>
+            </div>
+
             <a 
               href="/" 
               target="_blank" 
@@ -938,6 +1092,464 @@ export default function AdminPage() {
                     </div>
                   );
                 })}
+              </div>
+            </div>
+
+            {/* 5. Deals, Offers & Updates Popup Window Manager */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-secondary-dark shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-secondary-dark/80 mb-6">
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-primary flex items-center gap-2">
+                    <Tag className="h-5 w-5 text-accent" />
+                    Deals, Offers & Updates Popup Manager
+                  </h2>
+                  <p className="text-xs text-dark/60 font-light mt-1">
+                    Manage the promotional window that appears to visitors, announcing seasonal discounts, group offers, and packages.
+                  </p>
+                </div>
+
+                {/* Enable/Disable Toggle */}
+                <button
+                  type="button"
+                  onClick={() => setDealsState(prev => ({ ...prev, enabled: !prev.enabled }))}
+                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-2xl text-xs font-semibold transition-all shadow-sm ${
+                    dealsState.enabled
+                      ? 'bg-emerald-700 text-white hover:bg-emerald-800'
+                      : 'bg-secondary text-dark/60 border border-secondary-dark hover:bg-secondary-dark'
+                  }`}
+                >
+                  {dealsState.enabled ? (
+                    <>
+                      <ToggleRight className="h-4 w-4" />
+                      <span>Popup Active (Visible to Visitors)</span>
+                    </>
+                  ) : (
+                    <>
+                      <ToggleLeft className="h-4 w-4" />
+                      <span>Popup Disabled (Hidden)</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Badge Text */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Offer Badge Label
+                    </label>
+                    <input
+                      type="text"
+                      value={dealsState.badge}
+                      onChange={(e) => setDealsState(prev => ({ ...prev, badge: e.target.value }))}
+                      placeholder="e.g. Monsoon & Weekend Special"
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
+                  {/* Promo Code */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Mention / Coupon Code
+                    </label>
+                    <input
+                      type="text"
+                      value={dealsState.code}
+                      onChange={(e) => setDealsState(prev => ({ ...prev, code: e.target.value.toUpperCase() }))}
+                      placeholder="e.g. FAMILYMAULI"
+                      className="w-full text-xs font-mono font-bold px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                {/* Offer Headline */}
+                <div>
+                  <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                    Offer Headline / Title
+                  </label>
+                  <input
+                    type="text"
+                    value={dealsState.title}
+                    onChange={(e) => setDealsState(prev => ({ ...prev, title: e.target.value }))}
+                    placeholder="e.g. Family & Friends Gathering Offer"
+                    className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                {/* Offer Description */}
+                <div>
+                  <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                    Offer Narrative / Details
+                  </label>
+                  <textarea
+                    rows={3}
+                    value={dealsState.description}
+                    onChange={(e) => setDealsState(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Describe the offer details, group size discounts, or seasonal bonus..."
+                    className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent resize-none leading-relaxed"
+                  />
+                </div>
+
+                {/* Perks list */}
+                <div>
+                  <label className="text-[10px] font-bold text-primary/70 uppercase block mb-2">
+                    Deal Highlights & Included Perks
+                  </label>
+                  <div className="space-y-2 mb-3">
+                    {dealsState.perks?.map((perk, idx) => (
+                      <div key={idx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={perk}
+                          onChange={(e) => {
+                            const newPerks = [...dealsState.perks];
+                            newPerks[idx] = e.target.value;
+                            setDealsState(prev => ({ ...prev, perks: newPerks }));
+                          }}
+                          className="flex-grow text-xs px-3 py-2 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newPerks = dealsState.perks.filter((_, i) => i !== idx);
+                            setDealsState(prev => ({ ...prev, perks: newPerks }));
+                          }}
+                          className="p-2 text-dark/40 hover:text-accent rounded-lg transition-colors"
+                          title="Remove perk"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add a new perk or bonus..."
+                      value={newPerkInput}
+                      onChange={(e) => setNewPerkInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          if (newPerkInput.trim()) {
+                            setDealsState(prev => ({ ...prev, perks: [...(prev.perks || []), newPerkInput.trim()] }));
+                            setNewPerkInput('');
+                          }
+                        }
+                      }}
+                      className="flex-grow text-xs px-3 py-2 border border-secondary-dark/80 rounded-xl focus:outline-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (newPerkInput.trim()) {
+                          setDealsState(prev => ({ ...prev, perks: [...(prev.perks || []), newPerkInput.trim()] }));
+                          setNewPerkInput('');
+                        }
+                      }}
+                      className="px-4 py-2 bg-secondary hover:bg-secondary-dark border border-secondary-dark text-xs font-semibold text-primary rounded-xl flex items-center gap-1.5 transition-colors"
+                    >
+                      <Plus className="h-3.5 w-3.5" />
+                      <span>Add Perk</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Deal Promotional Poster Banner */}
+                <div>
+                  <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                    Deal Promotional Poster / Banner Image URL
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={dealsState.posterImage || ''}
+                      onChange={(e) => setDealsState(prev => ({ ...prev, posterImage: e.target.value }))}
+                      placeholder="e.g. /images/gallery/pool-deck.jpg or pasted cloud URL"
+                      className="flex-grow text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                    <label className="relative shrink-0">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          setUploadingKey('deals-poster');
+                          try {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            formData.append('key', 'posterImage');
+                            const res = await fetch('/api/admin/images', { method: 'POST', body: formData });
+                            const data = await res.json();
+                            if (data.url) {
+                              setDealsState(prev => ({ ...prev, posterImage: data.url }));
+                              setStatusMsg({ type: 'success', text: 'Poster image uploaded and attached to deals popup!' });
+                            }
+                          } catch (err: any) {
+                            setStatusMsg({ type: 'error', text: err.message || 'Upload failed' });
+                          } finally {
+                            setUploadingKey(null);
+                          }
+                        }}
+                      />
+                      <span className="px-4 py-2.5 rounded-xl border border-secondary-dark/80 bg-secondary hover:bg-secondary-dark text-xs font-bold text-primary tracking-wide uppercase flex items-center gap-1.5 cursor-pointer transition-colors shadow-sm">
+                        <Upload className="h-3.5 w-3.5" />
+                        <span>Upload Poster</span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Primary Button Text */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Action Button Text
+                    </label>
+                    <input
+                      type="text"
+                      value={dealsState.ctaText}
+                      onChange={(e) => setDealsState(prev => ({ ...prev, ctaText: e.target.value }))}
+                      placeholder="e.g. Claim Deal on WhatsApp"
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                {/* Save button */}
+                <div className="pt-4 border-t border-secondary-dark/80 flex items-center justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSaveDeals}
+                    disabled={uploadingKey !== null}
+                    className="px-8 py-3 bg-accent hover:bg-accent-light text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg flex items-center gap-2 transition-all"
+                  >
+                    <Save className="h-4 w-4" />
+                    <span>{uploadingKey === 'deals' ? 'Saving...' : 'Save Deals & Offers'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 6. Live Website Content & Real-Time Notices Manager */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-secondary-dark shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-secondary-dark/80 mb-6">
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-primary flex items-center gap-2">
+                    <FileText className="h-5 w-5 text-accent" />
+                    Website Content & Real-Time Seasonal Notices
+                  </h2>
+                  <p className="text-xs text-dark/60 font-light mt-1">
+                    Update text announcements, seasonal waterfall availability status, Vitthal Rukhmini Mandir details, and property features.
+                  </p>
+                </div>
+
+                {config.siteContent?.lastUpdated && (
+                  <span className="text-[11px] text-dark/60 bg-secondary px-3 py-1.5 rounded-full border border-secondary-dark">
+                    Last Published: {new Date(config.siteContent.lastUpdated).toLocaleDateString('en-IN', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-6">
+                {/* Announcement Bar */}
+                <div>
+                  <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                    Top Announcement / Welcome Notice
+                  </label>
+                  <input
+                    type="text"
+                    value={siteContentState.announcement || ''}
+                    onChange={(e) => setSiteContentState(prev => ({ ...prev, announcement: e.target.value }))}
+                    placeholder="e.g. Welcome to Mauli Farms! Current Season: Private Swimming Pool, Bonfire Nights..."
+                    className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Waterfall Season Status */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Waterfall Seasonal Availability Note
+                    </label>
+                    <input
+                      type="text"
+                      value={siteContentState.waterfallSeasonStatus || ''}
+                      onChange={(e) => setSiteContentState(prev => ({ ...prev, waterfallSeasonStatus: e.target.value }))}
+                      placeholder="e.g. Monsoon Seasonal (Active July – Sept) · Pool & Stream Year-Round"
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                  </div>
+
+                  {/* Plot Area */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Property Plot Area
+                    </label>
+                    <input
+                      type="text"
+                      value={siteContentState.plotArea || '1 Acre'}
+                      onChange={(e) => setSiteContentState(prev => ({ ...prev, plotArea: e.target.value }))}
+                      placeholder="1 Acre"
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Vitthal Rukhmini Mandir Note */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Vitthal Rukhmini Mandir Feature Note
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={siteContentState.templeNote || ''}
+                      onChange={(e) => setSiteContentState(prev => ({ ...prev, templeNote: e.target.value }))}
+                      placeholder="Describe the peaceful private temple inside your 1-acre property..."
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent resize-none leading-relaxed"
+                    />
+                  </div>
+
+                  {/* Swimming Pool Note */}
+                  <div>
+                    <label className="text-[10px] font-bold text-primary/70 uppercase block mb-1">
+                      Swimming Pool Feature Note
+                    </label>
+                    <textarea
+                      rows={3}
+                      value={siteContentState.poolNote || ''}
+                      onChange={(e) => setSiteContentState(prev => ({ ...prev, poolNote: e.target.value }))}
+                      placeholder="Describe the 12×24 ft pool, deck, clean water filtration, and views..."
+                      className="w-full text-xs px-3.5 py-2.5 border border-secondary-dark/80 rounded-xl focus:outline-none focus:border-accent resize-none leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* Publish Button */}
+                <div className="pt-4 border-t border-secondary-dark/80 flex items-center justify-between">
+                  <div className="text-xs text-emerald-800 font-medium flex items-center gap-1.5">
+                    <Radio className="h-3.5 w-3.5 text-emerald-600 animate-pulse" />
+                    <span>Saves instantly to live website with real-time timestamp</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleSaveSiteContent}
+                    disabled={uploadingKey !== null}
+                    className="px-8 py-3 bg-primary hover:bg-primary-light text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-md hover:shadow-lg flex items-center gap-2 transition-all"
+                  >
+                    <Save className="h-4 w-4" />
+                    <span>{uploadingKey === 'siteContent' ? 'Publishing...' : 'Publish Content Live'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* 7. Promotional Posters & Marketing Flyers Manager */}
+            <div className="bg-white rounded-3xl p-6 md:p-8 border border-secondary-dark shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-secondary-dark/80 mb-6">
+                <div>
+                  <h2 className="text-lg font-serif font-bold text-primary flex items-center gap-2">
+                    <ImageIcon className="h-5 w-5 text-accent" />
+                    Promotional Posters & Marketing Flyers Manager
+                  </h2>
+                  <p className="text-xs text-dark/60 font-light mt-1">
+                    Upload new promotional posters, festival banners, or seasonal offer flyers. You can assign any poster to the popup deals window.
+                  </p>
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Upload New Poster Card */}
+                <div className="p-5 rounded-2xl bg-secondary border border-secondary-dark/70 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div>
+                    <h3 className="text-xs font-bold text-primary uppercase tracking-wider mb-1">
+                      Upload New Poster / Banner Graphic
+                    </h3>
+                    <p className="text-xs text-dark/60 font-light">
+                      Supports JPG, PNG, WebP flyers and event posters.
+                    </p>
+                  </div>
+
+                  <label className="relative shrink-0">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        setUploadingKey('new-poster');
+                        try {
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          formData.append('key', 'posterImage');
+                          const res = await fetch('/api/admin/images', { method: 'POST', body: formData });
+                          const data = await res.json();
+                          if (data.url) {
+                            setConfig(data.config);
+                            setStatusMsg({ type: 'success', text: 'New marketing poster uploaded and saved successfully!' });
+                          }
+                        } catch (err: any) {
+                          setStatusMsg({ type: 'error', text: err.message || 'Upload failed' });
+                        } finally {
+                          setUploadingKey(null);
+                        }
+                      }}
+                    />
+                    <span className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary-light text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer transition-all shadow-sm">
+                      <Upload className={`h-4 w-4 ${uploadingKey === 'new-poster' ? 'animate-bounce' : ''}`} />
+                      <span>{uploadingKey === 'new-poster' ? 'Uploading...' : 'Upload Poster Flyer'}</span>
+                    </span>
+                  </label>
+                </div>
+
+                {/* Display Current Poster & Gallery */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 pt-2">
+                  {(config.posters || [config.posterImage || '/images/gallery/villa-exterior-day.jpg', '/images/gallery/pool-deck.jpg']).map((posterUrl, idx) => (
+                    <div key={idx} className="bg-white rounded-2xl p-4 border border-secondary-dark shadow-sm flex flex-col justify-between space-y-3">
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] font-bold text-dark/50 uppercase">Poster {idx + 1}</span>
+                          {dealsState.posterImage === posterUrl && (
+                            <span className="text-[9px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                              Active in Deals Popup
+                            </span>
+                          )}
+                        </div>
+                        <div className="relative aspect-[16/10] w-full rounded-xl overflow-hidden bg-secondary border border-secondary-dark">
+                          <Image
+                            src={posterUrl}
+                            alt={`Poster ${idx + 1}`}
+                            fill
+                            unoptimized
+                            className="object-cover"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDealsState(prev => ({ ...prev, posterImage: posterUrl }));
+                          setStatusMsg({ type: 'success', text: `Selected Poster ${idx + 1} as active deals popup poster!` });
+                        }}
+                        className={`w-full py-2 rounded-xl text-xs font-semibold transition-all border ${
+                          dealsState.posterImage === posterUrl
+                            ? 'bg-emerald-700 text-white border-emerald-700'
+                            : 'bg-secondary hover:bg-secondary-dark text-primary border-secondary-dark'
+                        }`}
+                      >
+                        {dealsState.posterImage === posterUrl ? 'Active In Deals Popup' : 'Set as Popup Poster'}
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 

@@ -1,43 +1,31 @@
 import { Navbar } from '../components/Navbar';
 import { Hero } from '../components/Hero';
 import { About } from '../components/About';
-import { WaterfallSpotlight } from '../components/WaterfallSpotlight';
+import { VillaSpaces } from '../components/VillaSpaces';
+import { Highlights } from '../components/Highlights';
 import { Gallery } from '../components/Gallery';
-import { Experiences } from '../components/Experiences';
-import { Amenities } from '../components/Amenities';
-import { BookingCTA } from '../components/BookingCTA';
-import { BookingForm } from '../components/BookingForm';
-import { Testimonials } from '../components/Testimonials';
-import { FAQ } from '../components/FAQ';
 import { Location } from '../components/Location';
-import { Contact } from '../components/Contact';
+import { BookingSection } from '../components/BookingSection';
 import { Footer } from '../components/Footer';
 import { FloatingButtons } from '../components/FloatingButtons';
-import { PropertyTourWidget } from '../components/PropertyTourWidget';
+import { DealsModal } from '../components/DealsModal';
 
 export default function Home() {
   return (
     <>
       <Navbar />
-      
       <main className="flex-grow">
         <Hero />
         <About />
-        <WaterfallSpotlight />
+        <VillaSpaces />
+        <Highlights />
         <Gallery />
-        <Experiences />
-        <Amenities />
-        <BookingCTA />
-        <BookingForm />
-        <Testimonials />
-        <FAQ />
         <Location />
-        <Contact />
+        <BookingSection />
       </main>
-      
       <Footer />
       <FloatingButtons />
-      <PropertyTourWidget />
+      <DealsModal />
     </>
   );
 }

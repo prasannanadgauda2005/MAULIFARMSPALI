@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, X, Volume2, VolumeX, SquarePlay } from 'lucide-react';
 import { useScroll } from '../hooks/useScroll';
@@ -10,16 +10,13 @@ export const PropertyTourWidget = () => {
   const { images } = useCustomImages();
   const { scrolled } = useScroll(600); // Only show after scrolling past Hero (600px)
   const [isOpen, setIsOpen] = useState(false);
-  const [isDismissed, setIsDismissed] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
-
-  // If user dismissed it, do not show again during this session
-  useEffect(() => {
-    const dismissedStatus = sessionStorage.getItem('tour_widget_dismissed');
-    if (dismissedStatus === 'true') {
-      setIsDismissed(true);
+  const [isDismissed, setIsDismissed] = useState<boolean>(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('tour_widget_dismissed') === 'true';
     }
-  }, []);
+    return false;
+  });
+  const [isMuted, setIsMuted] = useState(true);
 
   const handleDismiss = (e: React.MouseEvent) => {
     e.stopPropagation();

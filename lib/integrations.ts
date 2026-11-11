@@ -168,7 +168,7 @@ export async function fetchInstagramFeed(): Promise<InstagramPost[]> {
       id: 'ig_post_2',
       imageUrl: '/images/gallery/bedroom-master.jpg',
       permalink: 'https://instagram.com/p/mock2',
-      caption: 'Waking up to forest views. Absolute luxury in the middle of nature. #VacationRentals'
+      caption: 'Waking up to forest views. Absolute peace in the middle of nature. #VacationRentals'
     },
     {
       id: 'ig_post_3',

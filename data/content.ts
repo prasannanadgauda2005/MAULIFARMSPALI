@@ -18,12 +18,12 @@ export const siteConfig = {
 };
 
 export const quickFacts = [
-  { label: 'Private Pool', icon: 'Waves', description: 'Sparkling swimming pool with sun deck' },
-  { label: 'Private Waterfall', icon: 'Sparkles', description: 'Cascading natural waterfall inside the property' },
-  { label: 'Natural Stream', icon: 'Droplets', description: 'Fresh mountain water stream flowing through the plot' },
-  { label: 'Villa Layout', icon: 'Home', description: '2 Private Bedrooms + Mezzanine Loft Sanctuary' },
-  { label: 'Naturally Cooled', icon: 'Wind', description: 'Nature-cooled by stone architecture & dense forest canopies' },
-  { label: 'Pet Friendly', icon: 'PawPrint', description: '1.5 acres of gated green lawn' }
+  { label: 'Private Swimming Pool', icon: 'Waves', description: 'Sparkling 12×24 ft pool with spacious sun deck' },
+  { label: 'Vitthal Rukhmini Mandir', icon: 'Sparkles', description: 'Private temple inside our 1-acre property for quiet prayer' },
+  { label: 'Seasonal Waterfall & Stream', icon: 'Droplets', description: 'In-plot waterfall (monsoon seasonal) & freshwater stream' },
+  { label: 'Spacious 6-Area Layout', icon: 'Home', description: 'Master Bed, 2nd Bed, Upper Dormitory, Living, Kitchen & Verandah' },
+  { label: 'Naturally Cooled', icon: 'Wind', description: 'Nature-cooled by stone architecture & dense tree shade' },
+  { label: 'Pet & Kid Friendly', icon: 'PawPrint', description: '1 acre of safe, fully gated green lawn' }
 ];
 
 export const statistics = [
@@ -51,7 +51,7 @@ export const galleryItems: GalleryItem[] = [
   { id: 'g4', category: 'bedrooms', image: '/images/gallery/bedroom-guest.jpg', title: 'Comfort Guest Bedroom' },
   { id: 'g5', category: 'living-room', image: '/images/gallery/living-room-glass.jpg', title: 'Glass-walled Living Lounge' },
   { id: 'g6', category: 'pool', image: '/images/gallery/pool-deck.jpg', title: 'Stunning Private Pool & Deck' },
-  { id: 'g7', category: 'garden', image: '/images/gallery/drone-aerial-view.jpg', title: 'Lush 1.5 Acre Estate Surrounded by Forests' },
+  { id: 'g7', category: 'garden', image: '/images/gallery/drone-aerial-view.jpg', title: 'Lush 1 Acre Estate Surrounded by Forests' },
   { id: 'g8', category: 'kitchen', image: '/images/gallery/kitchen-modern.jpg', title: 'Fully-Equipped Modern Kitchen' },
   { id: 'g9', category: 'bonfire', image: '/images/gallery/bonfire-night.jpg', title: 'Cozy Bonfire Setup under the Stars' },
   { id: 'g10', category: 'bonfire', image: '/images/gallery/villa-night-view.jpg', title: 'Illuminated Estate at Night' },
@@ -123,33 +123,33 @@ export const amenities: Amenity[] = [
 export const bedrooms: Bedroom[] = [
   {
     id: 'room1',
-    title: 'Presidential Master Suite',
-    bedType: 'Royal King Bed',
+    title: 'Master Bedroom',
+    bedType: 'King Size Bed',
     capacity: '2-4 Guests',
-    features: ['Attached Luxury Bathroom', 'Private Verandah overlooking the Stream', 'Nature-cooled stone layout', 'Writing Desk'],
+    features: ['Attached Washroom', 'Private sit-out view', 'Nature-cooled stone layout', 'Wardrobe & Dressing'],
     hasWashroom: true,
     hasAC: false,
     images: ['/images/gallery/bedroom-master.jpg']
   },
   {
     id: 'room2',
-    title: 'Lawn-facing Verandah Suite',
-    bedType: 'King Size Bed',
-    capacity: '2-3 Guests',
-    features: ['Direct access to Lawn & Pool deck', 'Glass walls with garden views', 'Attached private bathroom', 'Comfort armchair'],
+    title: 'Bedroom Two',
+    bedType: '2 Single Beds',
+    capacity: '2 Guests',
+    features: ['Two Comfortable Single Beds', 'Fresh ventilation windows', 'Clean linen & storage', 'Attached washroom access'],
     hasWashroom: true,
     hasAC: false,
     images: ['/images/gallery/bedroom-guest.jpg']
   },
   {
     id: 'room3',
-    title: 'The Mezzanine Loft Sanctuary',
-    bedType: '4 Queen Beds + 4 Floor Mattresses',
-    capacity: '6-12 Guests',
-    features: ['Spacious attic loft design for groups', 'High vaulted ceilings', 'Cool breeze ventilation ducts', 'Indoor games nook'],
+    title: 'Upper Floor Dormitory Room',
+    bedType: 'Multiple Beds for Group Sleepovers',
+    capacity: '8-15 Guests',
+    features: ['Attached Big Washroom', 'Big Balcony with Mountain & Lawn Views', 'High timber cathedral ceiling', 'Spacious open hall for group sleepovers'],
     hasWashroom: true,
     hasAC: false,
-    images: ['/images/gallery/bedroom-master.jpg']
+    images: ['/images/gallery/bedroom-view-1.png']
   }
 ];
 
@@ -212,7 +212,7 @@ export const faqs: FAQItem[] = [
   {
     id: 'faq6',
     question: 'Are pets allowed?',
-    answer: 'Yes! We are 100% pet-friendly. Our 1.5-acre property is entirely fenced so your pets can run free on the green grass safely.'
+    answer: 'Yes! We are 100% pet-friendly. Our 1-acre property is entirely fenced so your pets can run free on the green grass safely.'
   }
 ];
 

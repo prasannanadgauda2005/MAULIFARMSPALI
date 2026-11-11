@@ -4,6 +4,7 @@ import { cn } from '../lib/utils';
 interface SectionTitleProps {
   title: string;
   subtitle?: string;
+  description?: string;
   align?: 'left' | 'center';
   dark?: boolean;
   className?: string;
@@ -12,6 +13,7 @@ interface SectionTitleProps {
 export const SectionTitle: React.FC<SectionTitleProps> = ({
   title,
   subtitle,
+  description,
   align = 'center',
   dark = false,
   className
@@ -27,8 +29,8 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
       {subtitle && (
         <span
           className={cn(
-            'text-xs font-bold uppercase tracking-widest mb-3 px-3 py-1 rounded-full border border-accent/20 bg-accent/5',
-            dark ? 'text-accent border-accent/30' : 'text-primary'
+            'text-[11px] md:text-xs font-semibold uppercase tracking-[0.22em] mb-3 block',
+            dark ? 'text-amber-300/90' : 'text-amber-800/90'
           )}
         >
           {subtitle}
@@ -36,18 +38,23 @@ export const SectionTitle: React.FC<SectionTitleProps> = ({
       )}
       <h2
         className={cn(
-          'font-serif text-3xl md:text-5xl font-bold tracking-tight',
+          'font-serif text-3xl md:text-5xl lg:text-6xl font-normal tracking-tight leading-[1.15]',
           dark ? 'text-white' : 'text-primary'
         )}
+        style={{ textWrap: 'balance' }}
       >
         {title}
       </h2>
-      <div
-        className={cn(
-          'h-1 w-16 bg-accent mt-4 rounded-full',
-          align === 'center' ? 'mx-auto' : 'mr-auto'
-        )}
-      />
+      {description && (
+        <p
+          className={cn(
+            'mt-4 text-sm md:text-base font-light max-w-2xl leading-relaxed',
+            dark ? 'text-white/70' : 'text-dark/70'
+          )}
+        >
+          {description}
+        </p>
+      )}
     </div>
   );
 };

@@ -2,8 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { Play, X, Waves, Volume2, VolumeX, Sparkles } from 'lucide-react';
+import { Play, X, Volume2, VolumeX, Droplets, ShieldCheck } from 'lucide-react';
 import { SectionTitle } from './SectionTitle';
 import { Button } from './ui/Button';
 import { useCustomImages } from '../hooks/useCustomImages';
@@ -13,52 +12,70 @@ export const WaterfallSpotlight = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
 
+  const handleBookNow = () => {
+    const target = document.querySelector('#booking-form');
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
-    <section id="waterfall-spotlight" className="compact-section bg-primary text-white relative overflow-hidden">
-      {/* Dynamic Background accents */}
-      <div className="absolute inset-0 z-0 opacity-10">
-        <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-accent blur-3xl rounded-full" />
+    <section id="waterfall" className="py-20 md:py-28 bg-primary text-white relative overflow-hidden">
+      {/* Background radial glow */}
+      <div className="absolute inset-0 pointer-events-none opacity-20">
+        <div className="absolute top-1/2 left-1/3 w-[500px] h-[500px] bg-accent/30 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-stretch">
-          
-          {/* Text Description Box */}
+        <SectionTitle
+          title="The Crown Jewel of Pali: An In-Plot Natural Waterfall"
+          subtitle="Exclusive Nature Feature"
+          description="A rare natural wonder that crowded public places cannot replicate. Experience cool, unpolluted mountain water cascading down natural stone steps directly into the property lawn."
+          dark
+          align="center"
+        />
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center mb-16">
+          {/* Narrative Column */}
           <motion.div
             initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6 }}
+            transition={{ duration: 0.7 }}
             className="lg:col-span-6 flex flex-col justify-center"
           >
-            <span className="text-[10px] font-bold uppercase tracking-widest text-accent mb-2 block">
-              Signature Estate Feature
-            </span>
-            <h2 className="font-serif text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-6 leading-tight">
-              Our Crown Jewel: <br />
-              <span className="text-accent">A Private Cascading Waterfall</span>
-            </h2>
-
-            <div className="space-y-4 text-white/80 text-xs md:text-sm leading-relaxed font-light mb-8">
+            <div className="space-y-5 text-white/80 text-sm md:text-base font-light leading-relaxed mb-8">
               <p>
-                At Mauli Farms Pali, nature is not just a view—it is a physical experience. Tucked inside the borders of our gated 1.5-acre property lies a **private, natural cascading waterfall** that flows directly during the monsoon seasons.
+                At Mauli Farms, nature is not a view viewed through glass—it is an intimate, sensory encounter. Flowing straight from the protected watersheds of the surrounding Pali and Sudhagad hills, a <strong>natural freshwater spring cascades over natural basalt rock formations</strong> nestled right inside our gated boundary.
               </p>
               <p>
-                The clean mountain water cascades down the natural stone steps of our backyard, pooling into a shallow, refreshing stream that flows directly past the outdoor seating decks and manicured lawns. 
+                The waterfall gathers into a crystal-clear, shallow stream that babbles peacefully across the lawn, running just steps away from the swimming pool and outdoor lounge decks. 
               </p>
               <p>
-                Whether you want to sit by the pool and listen to the soothing rushing water, or stand directly under the cool, refreshing fall, this USP offers complete exclusivity. You never share this space with outside tourists.
+                Because the estate is booked exclusively for your group, you never share this pristine pool or waterfall with outside day-trippers. Dip your feet in the water, shower under the cool cascades during monsoons, or fall asleep to the hypnotic sound of rushing mountain water.
               </p>
             </div>
 
-            {/* Accent Card */}
-            <div className="glass rounded-2xl p-4 mb-8 border border-white/10 flex items-start gap-3">
-              <Waves className="h-5 w-5 text-accent shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-xs font-bold text-accent">Pristine Spring Flow</h4>
-                <p className="text-[11px] text-white/70 font-light mt-0.5 leading-relaxed">
-                  Naturally cooled spring water flows directly from the surrounding Pali hills, providing a pure, chemical-free splash experience.
-                </p>
+            {/* Feature Highlights Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+              <div className="rounded-2xl p-4 bg-white/5 border border-white/10 flex items-start gap-3">
+                <Droplets className="h-5 w-5 text-amber-300 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-semibold text-white">Natural Spring Water</h4>
+                  <p className="text-[11px] text-white/60 font-light mt-0.5 leading-snug">
+                    Zero chlorine or chemicals. Pure rainwater runoff filtered through virgin hill stone.
+                  </p>
+                </div>
+              </div>
+
+              <div className="rounded-2xl p-4 bg-white/5 border border-white/10 flex items-start gap-3">
+                <ShieldCheck className="h-5 w-5 text-amber-300 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="text-xs font-semibold text-white">100% Gated & Private</h4>
+                  <p className="text-[11px] text-white/60 font-light mt-0.5 leading-snug">
+                    Completely inside our private perimeter with safe, shallow stone plunge steps.
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -66,37 +83,43 @@ export const WaterfallSpotlight = () => {
               <Button
                 onClick={() => setIsOpen(true)}
                 variant="accent"
-                className="py-3 px-6 rounded-full flex items-center gap-2 group text-xs font-bold uppercase tracking-wider shadow-md hover:shadow-lg transition-all"
+                size="md"
+                className="py-3 px-6 text-xs font-bold uppercase tracking-wider flex items-center gap-2 shadow-lg"
               >
-                <Play className="h-4 w-4 fill-white/20 group-hover:scale-110 transition-transform" />
+                <Play className="h-4 w-4 fill-white/20" />
                 Watch Waterfall Video
+              </Button>
+              <Button
+                onClick={handleBookNow}
+                variant="outline"
+                size="md"
+                className="py-3 px-6 text-xs font-bold uppercase tracking-wider text-white border-white/30 hover:bg-white hover:text-primary transition-colors"
+              >
+                Inquire For Monsoons
               </Button>
             </div>
           </motion.div>
 
-          {/* Interactive Looping Preview Panel */}
+          {/* Video Preview Column */}
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="lg:col-span-6 relative aspect-16/10 lg:aspect-auto min-h-[320px] rounded-3xl overflow-hidden border border-white/10 shadow-lg cursor-pointer group"
+            transition={{ duration: 0.7 }}
+            className="lg:col-span-6 relative aspect-[16/10] rounded-3xl overflow-hidden border border-white/15 shadow-2xl group cursor-pointer"
             onClick={() => setIsOpen(true)}
           >
-            {/* Dark gradient overlay */}
+            {/* Dark Scrim */}
             <div className="absolute inset-0 bg-primary-dark/30 group-hover:bg-primary-dark/40 transition-colors z-10" />
 
             {/* Play Button Indicator */}
             <div className="absolute inset-0 flex items-center justify-center z-20">
-              <motion.div
-                whileHover={{ scale: 1.08 }}
-                className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-lg group-hover:bg-white group-hover:text-primary transition-all duration-300"
-              >
+              <div className="h-16 w-16 rounded-full bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center text-white shadow-xl group-hover:scale-110 group-hover:bg-white group-hover:text-primary transition-all duration-300">
                 <Play className="h-6 w-6 fill-current ml-1" />
-              </motion.div>
+              </div>
             </div>
 
-            {/* Dynamic Loop video for premium look */}
+            {/* Video Loop */}
             <video
               autoPlay
               loop
@@ -104,22 +127,19 @@ export const WaterfallSpotlight = () => {
               playsInline
               preload="metadata"
               className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-              poster={images.waterfallBg}
+              poster={images.waterfallBg || '/images/gallery/villa-exterior-3.jpg'}
             >
               <source src={images.waterfallVideo} type="video/mp4" />
             </video>
 
-            {/* Bottom floating tag */}
-            <div className="absolute bottom-4 left-4 z-20 glass px-3.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider border border-white/10 flex items-center gap-1.5">
-              <Sparkles className="h-3 w-3 text-accent animate-pulse" />
-               monsoons live view
+            <div className="absolute bottom-4 left-4 z-20 glass px-3.5 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider text-white border border-white/15 flex items-center gap-1.5">
+              <span>Recorded on Property · Monsoons</span>
             </div>
           </motion.div>
-
         </div>
       </div>
 
-      {/* Full screen video modal */}
+      {/* Video Modal */}
       <AnimatePresence>
         {isOpen && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -128,35 +148,37 @@ export const WaterfallSpotlight = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="absolute inset-0 bg-primary-dark/95 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/90 backdrop-blur-md"
             />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden bg-black border border-white/10 shadow-2xl z-10"
+              className="relative w-full max-w-4xl aspect-video rounded-3xl overflow-hidden bg-black border border-white/20 shadow-2xl z-10"
             >
-              {/* Controls Header */}
-              <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/60 to-transparent z-20 flex items-center justify-between text-white">
-                <span className="font-serif text-sm font-semibold tracking-wide">Pali Cascading Waterfall — Mauli Farms</span>
+              <div className="absolute top-0 inset-x-0 p-4 bg-gradient-to-b from-black/80 to-transparent z-20 flex items-center justify-between text-white">
+                <span className="font-serif text-sm font-semibold tracking-wide">
+                  Private Cascading Waterfall — Mauli Farms Pali
+                </span>
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => setIsMuted(!isMuted)}
-                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white border border-white/10 transition-colors"
+                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/20 transition-colors"
+                    aria-label="Toggle mute"
                   >
                     {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
                   </button>
                   <button
                     onClick={() => setIsOpen(false)}
-                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white/80 hover:text-white border border-white/10 transition-colors"
+                    className="p-2 rounded-full bg-black/40 hover:bg-black/60 text-white border border-white/20 transition-colors"
+                    aria-label="Close video"
                   >
                     <X className="h-4 w-4" />
                   </button>
                 </div>
               </div>
 
-              {/* Main player - lazy load full stream */}
               <video
                 autoPlay
                 controls

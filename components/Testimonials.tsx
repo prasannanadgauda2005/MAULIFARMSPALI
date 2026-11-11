@@ -1,133 +1,68 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, MessageSquare } from 'lucide-react';
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Star, CheckCircle2 } from 'lucide-react';
 import { SectionTitle } from './SectionTitle';
 import { testimonials } from '../data/content';
 
 export const Testimonials = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-
-  const nextSlide = () => {
-    setActiveIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
-  const prevSlide = () => {
-    setActiveIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
-
-  // Autoplay
-  useEffect(() => {
-    const timer = setInterval(() => {
-      nextSlide();
-    }, 5000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <section className="py-20 md:py-28 bg-white overflow-hidden">
-      <div className="max-w-5xl mx-auto px-6">
+      <div className="max-w-7xl mx-auto px-6 md:px-12">
         <SectionTitle
-          title="Loved by Our Guests"
-          subtitle="Guest Reviews"
+          title="Verified Experiences from Real Guests"
+          subtitle="Guest Reviews & Ratings"
+          description="Rated 4.8★ on Google with over 1,200 delighted guests hosted across families, retreats, and celebrations."
           align="center"
         />
 
-        {/* Custom Glass Review Slider */}
-        <div className="relative">
-          <div className="max-w-4xl mx-auto relative min-h-[320px] md:min-h-[260px] flex items-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeIndex}
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -50 }}
-                transition={{ duration: 0.5 }}
-                className="w-full glass-card rounded-3xl p-8 md:p-12 border border-secondary-dark/60 shadow-lg flex flex-col md:flex-row gap-6 md:gap-10 items-start md:items-center relative"
-              >
-                {/* Decorative Quote Icon */}
-                <div className="absolute top-4 right-6 text-accent/15 select-none font-serif text-8xl pointer-events-none">
-                  “
-                </div>
-
-                {/* Profile Avatar Column */}
-                <div className="flex flex-col items-center text-center shrink-0">
-                  <div className="h-16 w-16 rounded-full bg-accent text-white flex items-center justify-center font-serif text-2xl font-semibold shadow-sm mb-3 border-2 border-accent-light/20">
-                    {testimonials[activeIndex].name.charAt(0)}
-                  </div>
-                  <h4 className="font-serif text-base font-bold text-primary">
-                    {testimonials[activeIndex].name}
-                  </h4>
-                  <p className="text-[10px] uppercase font-bold tracking-widest text-accent mt-1">
-                    {testimonials[activeIndex].role}
-                  </p>
-                </div>
-
-                {/* Review Text Column */}
-                <div className="flex-grow">
-                  {/* Stars Rating */}
-                  <div className="flex items-center gap-1 mb-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`h-4 w-4 ${
-                          i < testimonials[activeIndex].rating 
-                            ? 'text-accent fill-accent' 
-                            : 'text-dark/20'
-                        }`}
-                      />
-                    ))}
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-dark/40 ml-2">
-                      Verified Review
-                    </span>
-                  </div>
-
-                  <p className="text-sm font-light leading-relaxed text-dark/85 italic mb-4">
-                    "{testimonials[activeIndex].content}"
-                  </p>
-
-                  <span className="text-[10px] font-semibold text-dark/50 block">
-                    Posted {testimonials[activeIndex].date}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((review, idx) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="bg-secondary rounded-3xl p-8 border border-secondary-dark/70 shadow-sm hover:shadow-md transition-all flex flex-col justify-between group"
+            >
+              <div>
+                {/* 5-Star Row */}
+                <div className="flex items-center gap-1 mb-5">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-4 w-4 text-amber-500 fill-amber-500"
+                    />
+                  ))}
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-dark/40 ml-2">
+                    5.0 Google Review
                   </span>
                 </div>
-              </motion.div>
-            </AnimatePresence>
-          </div>
 
-          {/* Navigation Arrows */}
-          <div className="flex justify-center gap-4 mt-8">
-            <button
-              onClick={prevSlide}
-              className="p-3.5 rounded-full bg-secondary border border-secondary-dark hover:bg-primary hover:text-white transition-all text-primary focus:outline-none shadow-sm"
-              aria-label="Previous review"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={nextSlide}
-              className="p-3.5 rounded-full bg-secondary border border-secondary-dark hover:bg-primary hover:text-white transition-all text-primary focus:outline-none shadow-sm"
-              aria-label="Next review"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+                <p className="text-xs sm:text-sm font-light leading-relaxed text-dark/85 italic mb-6">
+                  &ldquo;{review.content}&rdquo;
+                </p>
+              </div>
 
-          {/* Dots Indicator */}
-          <div className="flex justify-center gap-2 mt-4">
-            {testimonials.map((_, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActiveIndex(idx)}
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  activeIndex === idx 
-                    ? 'w-6 bg-accent' 
-                    : 'w-2 bg-secondary-dark hover:bg-primary/50'
-                }`}
-                aria-label={`Go to slide ${idx + 1}`}
-              />
-            ))}
-          </div>
+              {/* Reviewer info */}
+              <div className="pt-5 border-t border-secondary-dark flex items-center justify-between">
+                <div>
+                  <h4 className="font-serif text-sm font-bold text-primary">
+                    {review.name}
+                  </h4>
+                  <p className="text-[11px] text-dark/60 font-light mt-0.5">
+                    {review.role}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1 text-[10px] font-medium text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+                  <CheckCircle2 className="h-3 w-3" />
+                  <span>Verified</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
         </div>
       </div>
     </section>

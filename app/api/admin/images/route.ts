@@ -80,7 +80,22 @@ const defaultFallbackConfig = {
       image: "/images/gallery/villa-exterior-7.jpg",
       highlight: "Breathtaking misty hill views"
     }
-  ]
+  ],
+  deals: {
+    enabled: true,
+    badge: "Monsoon & Weekend Special",
+    title: "Family & Friends Gathering Offer",
+    description: "Book for 10 or more guests and enjoy a complimentary evening stone bonfire with barbecue grill setup, plus special packages for multi-night stays!",
+    perks: [
+      "Complimentary Evening Bonfire & Charcoal BBQ Setup",
+      "Exclusive private access to in-plot natural waterfall & stream",
+      "Home-cooked village feasts prepared by local caretakers",
+      "100% Gated 1.5-Acre Lawn for kids and pets to play safely"
+    ],
+    code: "FAMILYMAULI",
+    ctaText: "Claim Deal on WhatsApp",
+    ctaUrl: "https://wa.me/919967519079?text=Hi%20Mauli%20Farms%2C%20I%20saw%20your%20Family%20Gathering%20Offer%20and%20would%20like%20to%20inquire%20for%20our%20stay."
+  }
 };
 
 async function ensureDirectoryExists(dir: string) {
@@ -145,7 +160,33 @@ export async function POST(req: NextRequest) {
 
     // Helper function to update config fields
     const updateConfigFields = (targetConfig: any, pathUrl: string) => {
-      if (key === 'heroBg' || key === 'aboutBg' || key === 'waterfallBg' || key === 'waterfallVideo' || key === 'tourVideo') {
+      if (key === 'deals') {
+        const dealsData = payload.deals || payload;
+        targetConfig.deals = {
+          ...(targetConfig.deals || defaultFallbackConfig.deals),
+          ...(dealsData.enabled !== undefined && { enabled: Boolean(dealsData.enabled) }),
+          ...(dealsData.badge !== undefined && { badge: dealsData.badge }),
+          ...(dealsData.title !== undefined && { title: dealsData.title }),
+          ...(dealsData.description !== undefined && { description: dealsData.description }),
+          ...(dealsData.posterImage !== undefined && { posterImage: dealsData.posterImage }),
+          ...(dealsData.perks !== undefined && { perks: Array.isArray(dealsData.perks) ? dealsData.perks : targetConfig.deals?.perks }),
+          ...(dealsData.code !== undefined && { code: dealsData.code }),
+          ...(dealsData.ctaText !== undefined && { ctaText: dealsData.ctaText }),
+          ...(dealsData.ctaUrl !== undefined && { ctaUrl: dealsData.ctaUrl }),
+        };
+      } else if (key === 'siteContent') {
+        targetConfig.siteContent = {
+          ...(targetConfig.siteContent || {}),
+          ...(payload.siteContent || payload),
+          lastUpdated: new Date().toISOString()
+        };
+      } else if (key === 'posterImage') {
+        targetConfig.posterImage = pathUrl;
+        if (!targetConfig.posters) targetConfig.posters = [];
+        if (!targetConfig.posters.includes(pathUrl)) {
+          targetConfig.posters.unshift(pathUrl);
+        }
+      } else if (key === 'heroBg' || key === 'aboutBg' || key === 'waterfallBg' || key === 'waterfallVideo' || key === 'tourVideo') {
         targetConfig[key] = pathUrl;
       } else if (key.startsWith('gallery-')) {
         const parts = key.split('-');

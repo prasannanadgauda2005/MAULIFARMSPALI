@@ -18,14 +18,14 @@ const playfair = Playfair_Display({
 export const metadata: Metadata = {
   metadataBase: new URL('https://maulifarms.com'),
   title: {
-    default: 'Mauli Farms Pali | Luxury Private 4BHK Farmhouse with Pool',
+    default: 'Mauli Farms Pali | Private 4BHK Nature Farmhouse with Pool',
     template: '%s | Mauli Farms Pali'
   },
-  description: 'Escape the city and experience nature at Mauli Farms, Pali. A premium private 4BHK farmhouse featuring a luxury pool, lawn, organic garden, and state-of-the-art amenities. Perfect for family stays, birthday celebrations, and corporate retreats.',
+  description: 'Escape the city and experience an authentic natural stay at Mauli Farms, Pali. A peaceful private 4BHK farmhouse with swimming pool, natural waterfall, mountain stream, organic orchards, and home-cooked food. Perfect for family and friends gatherings.',
   keywords: [
-    'Mauli Farms Pali', 'luxury villa Pali', 'farmhouse on rent Pali', '4BHK farmhouse Pali', 
-    'private pool villa Pali', 'weekend gateaway Mumbai Pune', 'resorts in Pali', 'Ashtavinayak temple stay', 
-    'Lohono stays Pali', 'best Airbnb Pali', 'private farmhouse Maharashtra'
+    'Mauli Farms Pali', 'farmhouse on rent Pali', '4BHK farmhouse Pali', 
+    'private pool farmhouse Pali', 'family weekend getaway Mumbai Pune', 'nature farmstay Pali', 'Ashtavinayak temple stay Pali', 
+    'farmstay near Mumbai Pune', 'private farmhouse Maharashtra with waterfall'
   ],
   authors: [{ name: 'Mauli Farms Pali' }],
   creator: 'Mauli Farms',
@@ -36,22 +36,22 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://maulifarms.com',
-    title: 'Mauli Farms Pali | Luxury Private 4BHK Farmhouse with Pool',
-    description: 'Exclusive 4BHK private villa experience in Pali, Maharashtra. Beautiful pool, lush lawns, delicious local food, and absolute privacy.',
+    title: 'Mauli Farms Pali | Private 4BHK Nature Farmhouse with Pool',
+    description: 'A private 4BHK countryside nature stay for family and friends in Pali, Maharashtra. Private pool, in-plot natural waterfall, lush lawns, authentic local food, and peace.',
     siteName: 'Mauli Farms',
     images: [
       {
         url: '/images/gallery/villa-exterior-day.jpg',
         width: 1200,
         height: 630,
-        alt: 'Mauli Farms Luxury Farmhouse Exterior',
+        alt: 'Mauli Farms Nature Farmhouse Exterior',
       }
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Mauli Farms Pali | Luxury Private 4BHK Farmhouse',
-    description: 'Exclusive private farmhouse stay in Pali, Maharashtra with a pool and lush garden.',
+    title: 'Mauli Farms Pali | Private 4BHK Nature Farmhouse',
+    description: 'A private countryside farmhouse stay in Pali, Maharashtra with a pool, mountain stream, and natural waterfall.',
     images: ['/images/gallery/villa-exterior-day.jpg'],
   },
   robots: {
@@ -76,7 +76,7 @@ export default function RootLayout({
     '@context': 'https://schema.org',
     '@type': 'LodgingBusiness',
     'name': siteConfig.name,
-    'description': 'Luxury 4BHK Private Farmhouse with pool in Pali, Maharashtra. Escape the city and experience nature.',
+    'description': 'Private 4BHK Nature Farmhouse with pool in Pali, Maharashtra. A natural stay for family and friends.',
     'image': 'https://maulifarms.com/images/gallery/villa-exterior-day.jpg',
     'address': {
       '@type': 'PostalAddress',
